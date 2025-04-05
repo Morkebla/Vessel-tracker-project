@@ -164,7 +164,8 @@ body {
 
 .sidebar {
   width: 330px;
-  background-color: #f8f9fa;
+  background-color: rgb(115, 179, 243);
+  color: white;
   height: 100%;
   border-right: 1px solid #ccc;
   position: relative;
@@ -205,7 +206,7 @@ li {
 }
 
 li:hover {
-  background-color: #e9ecef;
+  background-color: rgb(89, 66, 192);
 }
 
 .map-container {

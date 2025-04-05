@@ -2,58 +2,75 @@
   <div class="sidebar">
     <h2>Vessels</h2>
 
-    <!-- Dropdown Menu for Add/Update -->
-    <div class="dropdown">
-      <button class="dropdown-btn">Add/Update</button>
-      <div class="dropdown-content">
-        <button @click="showAddVesselForm">Add New Vessel</button>
-        <button @click="showUpdateVesselForm" :disabled="!selectedVessel">
-          Update Vessel
-        </button>
-      </div>
-    </div>
+    <!-- Add Button (Visible only if form is closed) -->
+    <button
+      v-if="!showAddForm"
+      class="icon-btn add-btn"
+      @click="showAddVesselForm"
+      title="Add Vessel"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="white"
+        viewBox="0 0 16 16"
+      >
+        <path d="M8 1v14M1 8h14" stroke="white" stroke-width="2" />
+      </svg>
+    </button>
 
     <!-- Add Vessel Form -->
-    <div v-if="showAddForm" class="add-vessel-form">
-      <h3>Add New Vessel</h3>
-      <input v-model="newVessel.name" placeholder="Vessel Name" class="input-field" />
-      <input
-        v-model="newVessel.latitude"
-        type="number"
-        placeholder="Latitude"
-        class="input-field"
-      />
-      <input
-        v-model="newVessel.longitude"
-        type="number"
-        placeholder="Longitude"
-        class="input-field"
-      />
-      <button @click="addVessel">Add Vessel</button>
-    </div>
+    <transition name="slide-fade">
+      <div v-if="showAddForm" class="form-container">
+        <div class="form-header">
+          <h3>Add New Vessel</h3>
+          <button class="close-btn" @click="showAddForm = false">×</button>
+        </div>
+        <input v-model="newVessel.name" placeholder="Vessel Name" class="input-field" />
+        <input
+          v-model="newVessel.latitude"
+          type="number"
+          placeholder="Latitude"
+          class="input-field"
+        />
+        <input
+          v-model="newVessel.longitude"
+          type="number"
+          placeholder="Longitude"
+          class="input-field"
+        />
+        <button @click="addVessel">Add Vessel</button>
+      </div>
+    </transition>
 
     <!-- Update Vessel Form -->
-    <div v-if="showUpdateForm" class="update-vessel-form">
-      <h3>Update Vessel</h3>
-      <input
-        v-model="selectedVessel.name"
-        placeholder="Vessel Name"
-        class="input-field"
-      />
-      <input
-        v-model="selectedVessel.latitude"
-        type="number"
-        placeholder="Latitude"
-        class="input-field"
-      />
-      <input
-        v-model="selectedVessel.longitude"
-        type="number"
-        placeholder="Longitude"
-        class="input-field"
-      />
-      <button @click="updateVessel">Update Vessel</button>
-    </div>
+    <transition name="slide-fade">
+      <div v-if="showUpdateForm" class="form-container">
+        <div class="form-header">
+          <h3>Update Vessel</h3>
+          <button class="close-btn" @click.stop="closeUpdateForm">×</button>
+        </div>
+        <input
+          v-model="selectedVessel.name"
+          placeholder="Vessel Name"
+          class="input-field"
+        />
+        <input
+          v-model="selectedVessel.latitude"
+          type="number"
+          placeholder="Latitude"
+          class="input-field"
+        />
+        <input
+          v-model="selectedVessel.longitude"
+          type="number"
+          placeholder="Longitude"
+          class="input-field"
+        />
+        <button @click="updateVessel">Update Vessel</button>
+      </div>
+    </transition>
 
     <input
       v-model="searchQuery"
@@ -66,9 +83,62 @@
         v-for="vessel in filteredVessels"
         :key="vessel.name"
         @click="selectVessel(vessel)"
+        class="vessel-item"
       >
-        {{ vessel.name }}
-        <button @click="deleteVessel(vessel.name)">Delete</button>
+        <div class="vessel-name-container">
+          <span class="vessel-name">{{ vessel.name }}</span>
+          <div class="actions">
+            <!-- Update (pen) button next to name -->
+            <button
+              v-if="!showUpdateForm"
+              class="icon-btn update-btn"
+              @click.stop="showUpdateVesselForm(vessel)"
+              :disabled="!vessel"
+              title="Update"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+                width="20"
+                height="20"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                />
+              </svg>
+            </button>
+
+            <!-- Delete (trash icon) -->
+            <button
+              class="icon-btn delete-btn"
+              @click.stop="deleteVessel(vessel.name)"
+              title="Delete"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+                width="20"
+                height="20"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -92,7 +162,7 @@ export default {
         longitude: null,
       },
       selectedVessel: null,
-      showAddForm: false, 
+      showAddForm: false,
       showUpdateForm: false,
     };
   },
@@ -144,7 +214,6 @@ export default {
       }
 
       this.$emit("update-vessel", this.selectedVessel);
-
       this.selectedVessel = null;
       this.showUpdateForm = false;
     },
@@ -154,88 +223,106 @@ export default {
       this.showUpdateForm = false; // Hide Update form if Add form is shown
     },
 
-    showUpdateVesselForm() {
-      if (this.selectedVessel) {
-        this.showUpdateForm = true;
-        this.showAddForm = false; // Hide Add form if Update form is shown
-      }
+    closeUpdateForm() {
+      this.showUpdateForm = false;
+    },
+
+    // This method opens the update form for a specific vessel
+    showUpdateVesselForm(vessel) {
+      this.selectedVessel = vessel;
+
+      // Show the update form
+      this.showUpdateForm = true;
+      this.showAddForm = false; // Hide Add form if Update form is shown
     },
   },
 };
 </script>
 
 <style scoped>
-/* Dropdown Button */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-btn {
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  z-index: 1;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  padding: 5px 0;
-}
-
-.dropdown-content button {
-  padding: 10px;
-  width: 100%;
+.icon-btn {
+  background: none;
   border: none;
-  background-color: transparent;
   cursor: pointer;
+  margin-left: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
 }
 
-.dropdown-content button:hover {
-  background-color: #f0f0f0;
+.icon-btn:hover {
+  background-color: #eee;
 }
 
-.dropdown:hover .dropdown-content {
-  display: block;
+.add-btn {
+  background-color: #007bff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 10px;
 }
 
-/* Form Styling */
-.add-vessel-form,
-.update-vessel-form {
+.add-btn svg {
+  stroke: white;
+}
+
+.vessel-item {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-
-.input-field {
+  align-items: center;
+  justify-content: space-between;
   padding: 10px;
-  margin: 5px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border-bottom: 1px solid #ddd;
 }
 
-button {
-  padding: 10px;
-  margin: 5px 0;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #f0f0f0;
-}
-
-.search-bar {
+.vessel-name-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+}
+
+.vessel-name {
+  flex-grow: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Form Slide Transition */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.form-container {
+  background: rgb(115, 179, 243);
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.82);
   margin-bottom: 20px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
 }
 </style>
